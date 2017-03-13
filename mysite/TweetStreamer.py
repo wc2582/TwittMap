@@ -1,8 +1,8 @@
 from twython import TwythonStreamer
 from elasticsearch import Elasticsearch, RequestsHttpConnection
+from datetime import datetime
 
-
-import random, requests
+import random, requests, json
 
 from requests_aws4auth import AWS4Auth
 '''
@@ -36,7 +36,9 @@ class MyStreamer(TwythonStreamer):
 					random.uniform(-180.0,180.0),
 					random.uniform(-90.0,90.0)
 				]
-				time = data['created_at']
+			time = data['created_at']
+			#time1 = datetime.strptime(time,"%a %b %d %H:%M:%S %z %Y")
+			#time1 = time1.strftime("%Y-%m-%d %H:%M:%S")
 			tweet = {
 				'user': data['user']['name'],
 				'coords': {
@@ -46,14 +48,13 @@ class MyStreamer(TwythonStreamer):
 				'time': time,
 				'text': data['text']
 			}
-			'''
-			print (tweet['time'].encode('utf-8'))
-			print (tweet['coords'])
-			print (tweet['text'].encode('utf-8'))
-			'''
-			#es = Elasticsearch(['search-twittmap-x3dpgzermwimqntgwel5amlwve.us-east-1.es.amazonaws.com'])
-			response = requests.post('https://search-twittmap-x3dpgzermwimqntgwel5amlwve.us-east-1.es.amazonaws.com/twittmap/tweet/',json=tweet)
 			
+			#print (tweet['time'])
+			#print (tweet['coords'])
+			#print (tweet['text'].encode('utf-8'))
+			
+			#es = Elasticsearch(['search-twittmap-x3dpgzermwimqntgwel5amlwve.us-east-1.es.amazonaws.com'])
+			response = requests.post('https://search-twittmap-x3dpgzermwimqntgwel5amlwve.us-east-1.es.amazonaws.com/twittmap/tweets/',json=tweet)
 			print (response.text)
 	def on_error(self, status_code, data):
 		print (status_code)
@@ -63,6 +64,10 @@ class MyStreamer(TwythonStreamer):
         # self.disconnect()
 stream = MyStreamer(APP_KEY, APP_SECRET,
                     OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
-stream.statuses.filter(track='twitter')
+while True:
+	try:
+		stream.statuses.filter(track='twitter')
+	except:
+		continue
 
 
