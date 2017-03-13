@@ -1,12 +1,29 @@
 from twython import TwythonStreamer
+from elasticsearch import Elasticsearch, RequestsHttpConnection
 
-import random 
 
+import random, requests
+
+from requests_aws4auth import AWS4Auth
+'''
+host = 'https://search-twittmap-x3dpgzermwimqntgwel5amlwve.us-east-1.es.amazonaws.com/twittmap/data'
+awsauth = AWS4Auth('AKIAJ36PBOCUOTUL4TUQ', 'sPatz8yeckYNOjtELEZv6B5QhG0UOlnJi0UIjoz+', 'us-east-1', 'es')
+es = Elasticsearch(
+    hosts=[{'host': host, 'port': 443}],
+    http_auth=awsauth,
+    use_ssl=True,
+    verify_certs=True,
+    connection_class=RequestsHttpConnection
+)
+print (es.info)
+'''
 
 APP_KEY='DCqdGQEBRmpsZyA0YM38jFvLD'
 APP_SECRET='qd8SDvqJLr239sxXXgAr0DOHIGAM1YN56OT8SsEgsUApbTv9z3'
 OAUTH_TOKEN='716831862941847552-HbxSaNfmj93h2VqdFfhTvzEhpOSBvJf'
 OAUTH_TOKEN_SECRET='q4mOw6u9lHEVfUkdVQBosqQYqE9pbN9IBC9DCvdmoqODb'
+
+HOST = 'search-twittmap-x3dpgzermwimqntgwel5amlwve.us-east-1.es.amazonaws.com'
 
 
 class MyStreamer(TwythonStreamer):
@@ -29,10 +46,15 @@ class MyStreamer(TwythonStreamer):
 				'time': time,
 				'text': data['text']
 			}
+			'''
 			print (tweet['time'].encode('utf-8'))
 			print (tweet['coords'])
 			print (tweet['text'].encode('utf-8'))
-
+			'''
+			#es = Elasticsearch(['search-twittmap-x3dpgzermwimqntgwel5amlwve.us-east-1.es.amazonaws.com'])
+			response = requests.post('https://search-twittmap-x3dpgzermwimqntgwel5amlwve.us-east-1.es.amazonaws.com/twittmap/tweet/',json=tweet)
+			
+			print (response.text)
 	def on_error(self, status_code, data):
 		print (status_code)
 
@@ -42,3 +64,5 @@ class MyStreamer(TwythonStreamer):
 stream = MyStreamer(APP_KEY, APP_SECRET,
                     OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
 stream.statuses.filter(track='twitter')
+
+
