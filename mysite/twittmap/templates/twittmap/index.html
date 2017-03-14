@@ -65,6 +65,63 @@ function initMap() {
 		map.panTo(new google.maps.LatLng(lat, lng));
 		map.setZoom(4);
 		circle.setVisible(true);
+
+		$.ajax({
+			type: "POST",
+			url: 'ajax/geolocation/',
+			data: {loc, radius, csrfmiddlewaretoken: '{{ csrf_token }}'},
+			dataType: "json",
+
+			success: function(data) {
+				for (marker in markers) {
+					markers[marker].setMap(null);
+				}
+				index = 0;
+				if (data == null) {
+					return;
+				}
+				console.log(data);
+				var tweets = data['hits']['hits'];
+				for (var i in tweets) {
+					var tweet = tweets[i]['_source'];
+					if (tweet == null) {
+						continue;
+					}
+					var desc = tweet.text;
+					var coordinate = tweet['coords'];
+					if(coordinate == null) {
+						continue;
+					}
+					var lat = coordinate.lat;
+					var lng = coordinate.lon;
+					//console.log(lat);
+					//console.log(typeof lat);
+					//console.log(lng);
+					//console.log(typeof lng);
+					var pos = new google.maps.LatLng(lat, lng);
+					var myinfowindow = new google.maps.InfoWindow({
+						content: desc
+					});
+
+					markers[index] = new google.maps.Marker({
+						position: pos,
+						map: map,
+						content: desc,
+						id: i,
+						infowindow: myinfowindow
+					});
+
+					google.maps.event.addListener(markers[index],'click', function() {
+						this.infowindow.open(map, this);
+					});
+					index = index + 1;
+
+				}
+			},
+			error: function(data) {
+				console.log("error: " + data);
+			}
+		});
 	});
 
 
