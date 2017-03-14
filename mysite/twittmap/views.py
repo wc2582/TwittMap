@@ -88,27 +88,29 @@ def update(request):
 
 
 def geolocation(request):
-    loc = request.POST['loc']
-    radius = request.POST['radius']
-    print (loc+"\n")
-    print (radius+"\n")
-
-    req = {
-            "query": {
-                "match_all":{}
-                },
-            "size": 100,
-            "filter": {
-                "geo_distance": {
-                    "distance": '%skm' % (radius),
-                    "location": loc
-                    }
-                }
-            }
-    
-    search_addr = '%s/twittmap2/test/_search' % (HOST)
-    response = requests.post(search_addr, data = json.dumps(req))
-    print (response.text)
-    return HttpResponse(response, content_type='application/json')
+	loc = request.POST['loc']
+	radius = request.POST['radius']
+	print (loc+"\n")
+	print (radius+"\n")
+	req = {
+		"size": 100,
+		"query": {
+			"bool": {
+				"must": {
+					"match_all":{}
+				},
+				"filter": {
+					"geo_distance": {
+						"distance": '1000km',
+						"coords": loc
+					}
+				}
+			}
+		}
+	}
+	search_addr = '%s/twittmap2/test/_search' % (HOST)
+	response = requests.post(search_addr, data = json.dumps(req))
+	print (response.text)
+	return HttpResponse(response, content_type='application/json')
 
 
