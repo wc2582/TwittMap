@@ -148,6 +148,10 @@ function initMap() {
 					return;
 				}
 
+		if (circle) {
+			circle.setVisible(false);
+		}
+
 				console.log(data);
 
 				var tweets = data['hits']['hits'];
@@ -207,6 +211,10 @@ function initMap() {
 			dataType: "json",
 
 			success: function(data) {
+
+		if (circle) {
+			circle.setVisible(false);
+		}
 				if (searchtext != prevSearch) {
 					for (marker in markers) {
 						markers[marker].setMap(null);
