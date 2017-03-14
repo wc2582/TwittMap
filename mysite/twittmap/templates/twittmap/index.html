@@ -19,7 +19,7 @@ html, body {
 		<form id="searchInput">
 			<input type="text" id="searchbox" placeholder="Search for tweets">
 			<!--
-			<button onclick="display()" type="button" id="searchButton">Search</button>
+	   <button onclick="display()" type="button" id="searchButton">Search</button>
 			-->
 			<button type="button" id="searchButton">Search</button>
 			<p id="test">hey</p>
@@ -30,23 +30,77 @@ html, body {
 
 var map;
 
-      $(document).ready(function(){
-	 });
+$(document).ready(function(){
+});
 
 $("#searchButton").click(function() {
-          //clearAll();
-	var st = $('#searchbox').val();
-	console.log(st);
+	//clearAll();
+	var searchtext = $('#searchbox').val();
+	console.log(searchtext);
 	$.ajax({
 		type: "POST",
-		url: '/ajax/search',
-		data: {searchtext: st},
+		url: 'ajax/search/',
+		data: {searchtext, csrfmiddlewaretoken: '{{ csrf_token }}'},
 		dataType: "json",
 
 		success: function(data) {
-			console.log(data);
-			var str = JSON.stringify(data, null, 2);
-			console.log(data); 
+
+
+	var markers = [];
+	for (var i = 1; i < 4; i++) {
+		var pos = new google.maps.LatLng(-25.363+i, 131.044-i);
+		var desc = '<div>Hello World' + i +'</div>';
+
+		var myinfowindow = new google.maps.InfoWindow({
+			content: desc
+		});
+
+		markers[i] = new google.maps.Marker({
+			position: pos,
+			map: map,
+			content: desc,
+			id: i,
+			infowindow: myinfowindow
+		});
+
+		google.maps.event.addListener(markers[i], 'click', function() {
+			this.infowindow.open(map, this);
+		});
+	}
+
+			var tweets = data['hits']['hits'];
+			var markers = [];
+			var index = 0;
+			for (var i in tweets) {
+				var tweet = tweets[i]['_source'];
+				if (tweet == null) {
+					continue;
+				}
+				var desc = tweet.text;
+				var coordinate = tweet['coords'];
+				if(coordinate == null) {
+					continue;
+				}
+				var lat = coordinate.latitude;
+				var lng = coordinate,longitude;
+				var pos = new google.maps.LatLng(lat, lng);
+				var myinfowindow = new google.maps.InfoWindow({
+					content: desc
+				});
+				
+				var cent = {lat: lat, lng: lng};
+				markers[index] = new google.maps.Marker({
+					position: pos,
+					map: map,
+					inforwindow: myinfowindow
+				});
+					
+				google.maps.event.addListener(markers[index],'click', function() {
+					this.infowindow.open(map, this);
+				});
+				index = index + 1;
+
+			}
 		},
 		error: function(data) {
 			console.log("error: " + data);
@@ -56,16 +110,38 @@ $("#searchButton").click(function() {
 
 function initMap() {
 	var uluru = {lat: -25.363, lng: 131.044};
-	 map = new google.maps.Map(document.getElementById('map'), {
+	map = new google.maps.Map(document.getElementById('map'), {
 		zoom: 8,
 		center: uluru
 	});
+	/*
 	var markers = new google.maps.Marker({
-                                position: uluru,
-                                map: map,
-                        });
+				position: uluru,
+				map: map,
+			});
+	 */
 }
+function addMarker(lat, lng, text) {
 
+	console.log('in add marker');
+	console.log(lat);
+	console.log(lng);
+	console.log(text);
+	var myinfowindow = new google.maps.InfoWindow({
+		content: text
+	});
+	var pos = new google.maps.LatLng(lat, lng);
+	var marker = new google.maps.Marker({
+		position: pos,
+		map: map,
+		content: text,
+		infowindow: myinfowindow
+	});
+
+	google.maps.event.addListener(marker, 'click', function() {
+		this.infowindow.open(map, this);
+	});
+}
 function display() {
 	var searchtext = document.getElementById("searchbox").value;
 	if (searchtext == "t1") {
@@ -74,28 +150,28 @@ function display() {
 		document.getElementById("test").innerHTML="else";
 	}
 	var uluru = {lat: -25.363, lng: 131.044};
-		var markers = [];
-		for (var i = 1; i < 4; i++) {
-			var pos = new google.maps.LatLng(-25.363+i, 131.044-i);
-			var desc = '<div>Hello World' + i +'</div>';
+	var markers = [];
+	for (var i = 1; i < 4; i++) {
+		var pos = new google.maps.LatLng(-25.363+i, 131.044-i);
+		var desc = '<div>Hello World' + i +'</div>';
 
-			var myinfowindow = new google.maps.InfoWindow({
-				content: desc
-			});
-			setTimeout(function(){myinfowindow.close();}, '20');
+		var myinfowindow = new google.maps.InfoWindow({
+			content: desc
+		});
+		setTimeout(function(){myinfowindow.close();}, '20');
 
-			markers[i] = new google.maps.Marker({
-				position: pos,
-				map: map,
-				content: desc,
-				id: i,
-				infowindow: myinfowindow
-			});
+		markers[i] = new google.maps.Marker({
+			position: pos,
+			map: map,
+			content: desc,
+			id: i,
+			infowindow: myinfowindow
+		});
 
-			google.maps.event.addListener(markers[i], 'click', function() {
-				this.infowindow.open(map, this);
-			});
-		}
+		google.maps.event.addListener(markers[i], 'click', function() {
+			this.infowindow.open(map, this);
+		});
+	}
 
 
 }
