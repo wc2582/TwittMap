@@ -44,3 +44,20 @@ def search(request):
     #print (test.text)
     #return render(response, 'twittmap/index.html')
     return HttpResponse(response, content_type='application/json')
+
+def update(request):
+    searchtext = request.POST['searchtext']
+    print(searchtext)
+    req = {
+            "query": {
+                "match":{
+                    "text": searchtext
+                    }
+                },
+            "size": 100
+            #"sort": [{"time": {"order": "desc"}}]
+            }
+    search_addr = '%s/twittmap/tweets/_search' % (HOST)
+    response = requests.post(search_addr, data = json.dumps(req))
+    print (response.text)
+    return HttpResponse(response, content_type='application/json')
