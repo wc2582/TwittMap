@@ -35,50 +35,24 @@ var map;
 
 $("#searchButton").click(function() {
           //clearAll();
-          var st = $('#searchbox').val();
-   		console.log(st);
-          $.ajax({
-            type: "POST",
-            url: '/ajax/search',
-            data: {searchtext: st},
-            dataType: "json",
+	var st = $('#searchbox').val();
+	console.log(st);
+	$.ajax({
+		type: "POST",
+		url: '/ajax/search',
+		data: {searchtext: st},
+		dataType: "json",
 
-            success: function(data) {
-		    console.log(data);
-		    var str = JSON.stringify(data, null, 2);
-		   console.log(data); 
-		    /*
-              for (var i in data) {
-                var tweet = data[i]["_source"];
-                if (tweet == null) {
-                  continue;
-                }
-                var name = tweet.name;
-                if (name == null) {
-                  continue;
-                }
-                var loc = tweet.location;
-                var latLng = new google.maps.LatLng(loc.lat, loc.lon);
-                var marker = new google.maps.Marker({
-                  position: latLng,
-                  map: map,
-                  draggable: false,
-                  // animation: google.maps.Animation.DROP,
-                });
-
-                attachMessage(marker, tweet);
-                twittCount += 1;
-                markers.push(marker);
-                markerCluster.addMarker(marker);
-              }
-              updateCount(lastTweetCount, twittCount);
-	      */
-            },
-            error: function(data) {
-              console.log("error: " + data);
-            }
-          });
-        });
+		success: function(data) {
+			console.log(data);
+			var str = JSON.stringify(data, null, 2);
+			console.log(data); 
+		},
+		error: function(data) {
+			console.log("error: " + data);
+		}
+	});
+});
 
 function initMap() {
 	var uluru = {lat: -25.363, lng: 131.044};

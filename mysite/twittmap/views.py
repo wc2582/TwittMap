@@ -10,13 +10,34 @@ template = 'twittmap/index.html'
 
 
 def index(request):    
-	#es = Elasticsearch(HOST)
-	#print (es.info)
+	'''	
+	req = {
+		"settings": {
+		"number_of_shards": 5,
+		"number_of_replicas": 1
+		},
+		"mappings": {
+			"tweets": {
+				"properties": {
+					"user": { "type" : "text" },
+					"coords": { "type": "geo_point"},
+					"time": { "type": "text"},
+					"text": { "type": "text"}
+				}
+			}
+		}
+	}
+	search_addr = '%s/twittmap' % (HOST)
+	response = requests.post(search_addr, data = json.dumps(req))
+	print (response.text)
+	'''
+
+
 	req = {
 		"query": {
 			"match_all":{}
 			},
-		"size": 1
+		"size": 100
 		#"sort": [{"time": {"order": "desc"}}]
 		}
 	search_addr = '%s/twittmap/tweets/_search' % (HOST)
@@ -26,21 +47,23 @@ def index(request):
 
 def search(request):
     #searchtext = request.POST['searchtext']
-    searchtext = request.POST.get('searchtext', False)
-    print (searchtext)
+	searchtext = request.POST.get('searchtext', False)
+	print (searchtext)
     #response = '<h1>test<h1>'
 
 
-    req = {
-    	"query": {
-    		"match_all":{}
-    		},
-    	"size": 1
+	req = {
+		"query": {
+			"match":{
+				"text": searchtext
+			}
+		},
+		"size": 100
     	#"sort": [{"time": {"order": "desc"}}]
-    	}
-    search_addr = '%s/twittmap/tweets/_search' % (HOST)
-    response = requests.post(search_addr, data = json.dumps(req))
+	}
+	search_addr = '%s/twittmap/tweets/_search' % (HOST)
+	response = requests.post(search_addr, data = json.dumps(req))
 
-
-    return HttpResponse(response)
+	print (response.text)
+	return render(request, 'twittmap/index.html')
     #return HttpResponse(response, content_type='application/json')
