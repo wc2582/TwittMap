@@ -36,7 +36,7 @@ $(document).ready(function(){
 $("#searchButton").click(function() {
 	//clearAll();
 	var searchtext = $('#searchbox').val();
-	console.log(searchtext);
+	//console.log(searchtext);
 	$.ajax({
 		type: "POST",
 		url: 'ajax/search/',
@@ -45,28 +45,6 @@ $("#searchButton").click(function() {
 
 		success: function(data) {
 
-
-	var markers = [];
-	for (var i = 1; i < 4; i++) {
-		var pos = new google.maps.LatLng(-25.363+i, 131.044-i);
-		var desc = '<div>Hello World' + i +'</div>';
-
-		var myinfowindow = new google.maps.InfoWindow({
-			content: desc
-		});
-
-		markers[i] = new google.maps.Marker({
-			position: pos,
-			map: map,
-			content: desc,
-			id: i,
-			infowindow: myinfowindow
-		});
-
-		google.maps.event.addListener(markers[i], 'click', function() {
-			this.infowindow.open(map, this);
-		});
-	}
 
 			var tweets = data['hits']['hits'];
 			var markers = [];
@@ -77,24 +55,33 @@ $("#searchButton").click(function() {
 					continue;
 				}
 				var desc = tweet.text;
+				//var desc = '<div>Hello World' + i +'</div>';
 				var coordinate = tweet['coords'];
 				if(coordinate == null) {
 					continue;
 				}
 				var lat = coordinate.latitude;
-				var lng = coordinate,longitude;
+				var lng = coordinate.longitude;
+				//console.log(lat);
+				//console.log(typeof lat);
+				//console.log(lng);
+				//console.log(typeof lng);
 				var pos = new google.maps.LatLng(lat, lng);
+				//var pos = new google.maps.LatLng(-25.363+index, 131.044-index);
 				var myinfowindow = new google.maps.InfoWindow({
 					content: desc
 				});
-				
+
 				var cent = {lat: lat, lng: lng};
 				markers[index] = new google.maps.Marker({
 					position: pos,
 					map: map,
-					inforwindow: myinfowindow
+					content: desc,
+					id: i,
+					infowindow: myinfowindow
 				});
-					
+
+
 				google.maps.event.addListener(markers[index],'click', function() {
 					this.infowindow.open(map, this);
 				});
@@ -111,7 +98,7 @@ $("#searchButton").click(function() {
 function initMap() {
 	var uluru = {lat: -25.363, lng: 131.044};
 	map = new google.maps.Map(document.getElementById('map'), {
-		zoom: 8,
+		zoom: 2,
 		center: uluru
 	});
 	/*
@@ -121,27 +108,7 @@ function initMap() {
 			});
 	 */
 }
-function addMarker(lat, lng, text) {
 
-	console.log('in add marker');
-	console.log(lat);
-	console.log(lng);
-	console.log(text);
-	var myinfowindow = new google.maps.InfoWindow({
-		content: text
-	});
-	var pos = new google.maps.LatLng(lat, lng);
-	var marker = new google.maps.Marker({
-		position: pos,
-		map: map,
-		content: text,
-		infowindow: myinfowindow
-	});
-
-	google.maps.event.addListener(marker, 'click', function() {
-		this.infowindow.open(map, this);
-	});
-}
 function display() {
 	var searchtext = document.getElementById("searchbox").value;
 	if (searchtext == "t1") {
