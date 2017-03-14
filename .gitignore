@@ -1,2 +1,4 @@
 new 1.py
 mysite/db.sqlite3
+mysite/tweet.py
+*.txt

@@ -23,7 +23,7 @@ APP_SECRET='qd8SDvqJLr239sxXXgAr0DOHIGAM1YN56OT8SsEgsUApbTv9z3'
 OAUTH_TOKEN='716831862941847552-HbxSaNfmj93h2VqdFfhTvzEhpOSBvJf'
 OAUTH_TOKEN_SECRET='q4mOw6u9lHEVfUkdVQBosqQYqE9pbN9IBC9DCvdmoqODb'
 
-HOST = 'search-twittmap-x3dpgzermwimqntgwel5amlwve.us-east-1.es.amazonaws.com'
+HOST = 'https://search-twittmap1-q22wgseqgxjgys23kyp65eli4u.us-east-1.es.amazonaws.com'
 
 
 class MyStreamer(TwythonStreamer):
@@ -42,8 +42,8 @@ class MyStreamer(TwythonStreamer):
 			tweet = {
 				'user': data['user']['name'],
 				'coords': {
-					'latitude': geo_coords[1],
-					'longitude': geo_coords[0]
+					'lat': geo_coords[1],
+					'lon': geo_coords[0]
 				},
 				'time': time1,
 				'text': data['text']
@@ -54,7 +54,7 @@ class MyStreamer(TwythonStreamer):
 			print (tweet['text'].encode('utf-8'))
 			
 			#es = Elasticsearch(['search-twittmap-x3dpgzermwimqntgwel5amlwve.us-east-1.es.amazonaws.com'])
-			response = requests.post('https://search-twittmap-x3dpgzermwimqntgwel5amlwve.us-east-1.es.amazonaws.com/twittmap/test1/',json=tweet)
+			response = requests.post('https://search-twittmap1-q22wgseqgxjgys23kyp65eli4u.us-east-1.es.amazonaws.com/twittmap2/test/',json=tweet)
 			print (response.text)
 	def on_error(self, status_code, data):
 		print (status_code)
