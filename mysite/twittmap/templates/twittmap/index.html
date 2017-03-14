@@ -69,11 +69,11 @@ function initMap() {
 					if(coordinate == null) {
 						continue;
 					}
-					var lat = coordinate.latitude;
-					var lng = coordinate.longitude;
-					//console.log(lat);
+					var lat = coordinate.lat;
+					var lng = coordinate.lon;
+					console.log(lat);
 					//console.log(typeof lat);
-					//console.log(lng);
+					console.log(lng);
 					//console.log(typeof lng);
 					var pos = new google.maps.LatLng(lat, lng);
 					var myinfowindow = new google.maps.InfoWindow({
@@ -133,8 +133,8 @@ function initMap() {
 					if(coordinate == null) {
 						continue;
 					}
-					var lat = coordinate.latitude;
-					var lng = coordinate.longitude;
+					var lat = coordinate.lat;
+					var lng = coordinate.lon;
 					//console.log(lat);
 					//console.log(typeof lat);
 					//console.log(lng);
