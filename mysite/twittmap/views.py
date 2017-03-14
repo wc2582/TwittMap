@@ -15,14 +15,14 @@ def index(request):
             "size": 100
             #"sort": [{"time": {"order": "desc"}}]
             }
-    search_addr = '%s/twittmap/tweets/_search' % (HOST)
+    search_addr = '%s/twittmap/test1/_search' % (HOST)
     response = requests.post(search_addr, data = json.dumps(req))
     #print (response.text)
     return render(request, 'twittmap/index.html')
 
 def search(request):
     searchtext = request.POST['searchtext']
-    #print (searchtext)
+    print (searchtext)
     #searchtext = request.POST.get('searchtext', False)
     #print (searchtext)
     #response = '<h1>test<h1>'
@@ -34,10 +34,10 @@ def search(request):
                     "text": searchtext
                     }
                 },
-            "size": 1000
+            "size": 100
             #"sort": [{"time": {"order": "desc"}}]
             }
-    search_addr = '%s/twittmap/tweets/_search' % (HOST)
+    search_addr = '%s/twittmap/test1/_search' % (HOST)
     response = requests.post(search_addr, data = json.dumps(req))
     #print (response.text)
     #test = response['hits']['hits']

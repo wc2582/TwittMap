@@ -29,32 +29,32 @@ HOST = 'search-twittmap-x3dpgzermwimqntgwel5amlwve.us-east-1.es.amazonaws.com'
 class MyStreamer(TwythonStreamer):
 	def on_success(self, data):
 		if 'text' in data:
-			try:
-				geo_coords = data['coordinates']['coordinates']
-			except:
-				geo_coords = [
-					random.uniform(-180.0,180.0),
-					random.uniform(-90.0,90.0)
-				]
+#			try:
+			geo_coords = data['coordinates']['coordinates']
+#			except:
+#				geo_coords = [
+#					random.uniform(-180.0,180.0),
+#					random.uniform(-90.0,90.0)
+#				]
 			time = data['created_at']
-			#time1 = datetime.strptime(time,"%a %b %d %H:%M:%S %z %Y")
-			#time1 = time1.strftime("%Y-%m-%d %H:%M:%S")
+			time1 = datetime.strptime(time,"%a %b %d %H:%M:%S %z %Y")
+			time1 = time1.strftime("%Y-%m-%d %H:%M:%S")
 			tweet = {
 				'user': data['user']['name'],
 				'coords': {
 					'latitude': geo_coords[1],
 					'longitude': geo_coords[0]
 				},
-				'time': time,
+				'time': time1,
 				'text': data['text']
 			}
 			
-			#print (tweet['time'])
-			#print (tweet['coords'])
-			#print (tweet['text'].encode('utf-8'))
+			print (tweet['time'])
+			print (tweet['coords'])
+			print (tweet['text'].encode('utf-8'))
 			
 			#es = Elasticsearch(['search-twittmap-x3dpgzermwimqntgwel5amlwve.us-east-1.es.amazonaws.com'])
-			response = requests.post('https://search-twittmap-x3dpgzermwimqntgwel5amlwve.us-east-1.es.amazonaws.com/twittmap/tweets/',json=tweet)
+			response = requests.post('https://search-twittmap-x3dpgzermwimqntgwel5amlwve.us-east-1.es.amazonaws.com/twittmap/test1/',json=tweet)
 			print (response.text)
 	def on_error(self, status_code, data):
 		print (status_code)
@@ -66,7 +66,7 @@ stream = MyStreamer(APP_KEY, APP_SECRET,
                     OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
 while True:
 	try:
-		stream.statuses.filter(track='twitter')
+		stream.statuses.filter(locations=[-180,-90,180,90])
 	except:
 		continue
 
