@@ -30,7 +30,7 @@ var markers = [];
 var index = 0;
 var searchEmpty;
 var update;
-var test = '';
+var circle;
 $(document).ready(function(){
 	//searchEmpty = $('#searchbox').val();
 	update = false;
@@ -43,6 +43,41 @@ function initMap() {
 		center: uluru
 	});
 
+
+	map.addListener('click', function(event) {
+		if (circle) {
+			circle.setVisible(false);
+		}
+		var lat = event.latLng.lat();
+		var lng = event.latLng.lng();
+		var loc = ""+lat + "," + lng;
+		var radius = 1000000; 
+		circle = new google.maps.Circle({
+			strokeColor: '#00FFFF',
+			strokeOpacity: 0.6,
+			strokeWeight: 1,
+			fillColor: '#00FFFF',
+			fillOpacity: 0.4,
+			map: map,
+			center: new google.maps.LatLng(lat, lng),
+			radius: radius
+		});	
+		map.panTo(new google.maps.LatLng(lat, lng));
+		map.setZoom(4);
+		circle.setVisible(true);
+	});
+
+
+
+
+
+
+
+
+
+
+
+
 	(function worker() {
 		var searchtext = $('#searchbox').val();
 		console.log(searchtext);
@@ -50,7 +85,7 @@ function initMap() {
 			type: "POST",
 			url: 'ajax/update/', 
 			data: {searchtext, csrfmiddlewaretoken: '{{ csrf_token }}'},
-                        dataType: "json",
+			dataType: "json",
 			success: function(data) {
 				if (!update) {
 					return;
