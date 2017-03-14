@@ -18,81 +18,22 @@ html, body {
 	<body>
 		<form id="searchInput">
 			<input type="text" id="searchbox" placeholder="Search for tweets">
-			<!--
-	   <button onclick="display()" type="button" id="searchButton">Search</button>
-			-->
 			<button type="button" id="searchButton">Search</button>
-			<p id="test">hey</p>
 		</form>
 		<div id="map"></div>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 		<script>
 
 var map;
-
+var prevSearch;
+var markers = [];
+var index = 0;
+var searchEmpty;
+var update;
+var test = '';
 $(document).ready(function(){
-});
-
-$("#searchButton").click(function() {
-	//clearAll();
-	var searchtext = $('#searchbox').val();
-	//console.log(searchtext);
-	$.ajax({
-		type: "POST",
-		url: 'ajax/search/',
-		data: {searchtext, csrfmiddlewaretoken: '{{ csrf_token }}'},
-		dataType: "json",
-
-		success: function(data) {
-
-
-			var tweets = data['hits']['hits'];
-			var markers = [];
-			var index = 0;
-			for (var i in tweets) {
-				var tweet = tweets[i]['_source'];
-				if (tweet == null) {
-					continue;
-				}
-				var desc = tweet.text;
-				//var desc = '<div>Hello World' + i +'</div>';
-				var coordinate = tweet['coords'];
-				if(coordinate == null) {
-					continue;
-				}
-				var lat = coordinate.latitude;
-				var lng = coordinate.longitude;
-				//console.log(lat);
-				//console.log(typeof lat);
-				//console.log(lng);
-				//console.log(typeof lng);
-				var pos = new google.maps.LatLng(lat, lng);
-				//var pos = new google.maps.LatLng(-25.363+index, 131.044-index);
-				var myinfowindow = new google.maps.InfoWindow({
-					content: desc
-				});
-
-				var cent = {lat: lat, lng: lng};
-				markers[index] = new google.maps.Marker({
-					position: pos,
-					map: map,
-					content: desc,
-					id: i,
-					infowindow: myinfowindow
-				});
-
-
-				google.maps.event.addListener(markers[index],'click', function() {
-					this.infowindow.open(map, this);
-				});
-				index = index + 1;
-
-			}
-		},
-		error: function(data) {
-			console.log("error: " + data);
-		}
-	});
+	//searchEmpty = $('#searchbox').val();
+	update = false;
 });
 
 function initMap() {
@@ -101,47 +42,131 @@ function initMap() {
 		zoom: 2,
 		center: uluru
 	});
-	/*
-	var markers = new google.maps.Marker({
-				position: uluru,
-				map: map,
-			});
-	 */
+
+	(function worker() {
+		var searchtext = $('#searchbox').val();
+		console.log(searchtext);
+		$.ajax({
+			type: "POST",
+			url: 'ajax/update/', 
+			data: {searchtext, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                        dataType: "json",
+			success: function(data) {
+				if (!update) {
+					return;
+				}
+
+				console.log(data);
+
+				var tweets = data['hits']['hits'];
+				for (var i in tweets) {
+					var tweet = tweets[i]['_source'];
+					if (tweet == null) {
+						continue;
+					}
+					var desc = tweet.text;
+					var coordinate = tweet['coords'];
+					if(coordinate == null) {
+						continue;
+					}
+					var lat = coordinate.latitude;
+					var lng = coordinate.longitude;
+					//console.log(lat);
+					//console.log(typeof lat);
+					//console.log(lng);
+					//console.log(typeof lng);
+					var pos = new google.maps.LatLng(lat, lng);
+					var myinfowindow = new google.maps.InfoWindow({
+						content: desc
+					});
+
+					markers[index] = new google.maps.Marker({
+						position: pos,
+						map: map,
+						content: desc,
+						id: i,
+						infowindow: myinfowindow
+					});
+
+					google.maps.event.addListener(markers[index],'click', function() {
+						this.infowindow.open(map, this);
+					});
+					index = index + 1;
+					console.log(index);
+
+				}
+
+			},
+			complete: function() {
+				// Schedule the next request when the current one's complete
+				setTimeout(worker, 5000);
+			}
+		});
+	})();
+
+	$("#searchButton").click(function() {
+		var searchtext = $('#searchbox').val();
+		//console.log(searchtext);
+		update = true;
+		$.ajax({
+			type: "POST",
+			url: 'ajax/search/',
+			data: {searchtext, csrfmiddlewaretoken: '{{ csrf_token }}'},
+			dataType: "json",
+
+			success: function(data) {
+				if (searchtext != prevSearch) {
+					for (marker in markers) {
+						markers[marker].setMap(null);
+					}
+					index = 0;
+				}	
+
+				var tweets = data['hits']['hits'];
+				for (var i in tweets) {
+					var tweet = tweets[i]['_source'];
+					if (tweet == null) {
+						continue;
+					}
+					var desc = tweet.text;
+					var coordinate = tweet['coords'];
+					if(coordinate == null) {
+						continue;
+					}
+					var lat = coordinate.latitude;
+					var lng = coordinate.longitude;
+					//console.log(lat);
+					//console.log(typeof lat);
+					//console.log(lng);
+					//console.log(typeof lng);
+					var pos = new google.maps.LatLng(lat, lng);
+					var myinfowindow = new google.maps.InfoWindow({
+						content: desc
+					});
+
+					markers[index] = new google.maps.Marker({
+						position: pos,
+						map: map,
+						content: desc,
+						id: i,
+						infowindow: myinfowindow
+					});
+
+					google.maps.event.addListener(markers[index],'click', function() {
+						this.infowindow.open(map, this);
+					});
+					index = index + 1;
+
+				}
+			},
+			error: function(data) {
+				console.log("error: " + data);
+			}
+		});
+	});
+
 }
 
-function display() {
-	var searchtext = document.getElementById("searchbox").value;
-	if (searchtext == "t1") {
-		document.getElementById("test").innerHTML="test";
-	} else {
-		document.getElementById("test").innerHTML="else";
-	}
-	var uluru = {lat: -25.363, lng: 131.044};
-	var markers = [];
-	for (var i = 1; i < 4; i++) {
-		var pos = new google.maps.LatLng(-25.363+i, 131.044-i);
-		var desc = '<div>Hello World' + i +'</div>';
-
-		var myinfowindow = new google.maps.InfoWindow({
-			content: desc
-		});
-		setTimeout(function(){myinfowindow.close();}, '20');
-
-		markers[i] = new google.maps.Marker({
-			position: pos,
-			map: map,
-			content: desc,
-			id: i,
-			infowindow: myinfowindow
-		});
-
-		google.maps.event.addListener(markers[i], 'click', function() {
-			this.infowindow.open(map, this);
-		});
-	}
-
-
-}
 		</script>
 		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBI0jXwm778d4BKbvypdN6cGjCDi5myNWU&callback=initMap"
 	  async defer></script>
